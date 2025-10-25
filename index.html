@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>50K Celebration Gallery</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --color-1: #9A3F3F;
+            --color-2: #C1856D;
+            --color-3: #E6CFA9;
+            --color-4: #FBF9D1;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--color-4) 0%, var(--color-3) 100%);
+            min-height: 100vh;
+            font-family: 'Georgia', serif;
+        }
+
+        /* Scroll-driven animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(60px) scale(0.95) rotateX(10deg);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1) rotateX(0);
+            }
+        }
+
+        @keyframes fadeInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-60px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0) scale(1);
+            }
+        }
+
+        @keyframes fadeInRight {
+            from {
+                opacity: 0;
+                transform: translateX(60px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0) scale(1);
+            }
+        }
+
+        @keyframes zoomIn {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .gallery-item {
+            opacity: 0;
+            animation-duration: 0.8s;
+            animation-fill-mode: both;
+            animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .gallery-item.animate {
+            animation-name: fadeInUp;
+        }
+
+        .gallery-item:nth-child(3n+1).animate {
+            animation-name: fadeInLeft;
+        }
+
+        .gallery-item:nth-child(3n+2).animate {
+            animation-name: zoomIn;
+        }
+
+        .gallery-item:nth-child(3n).animate {
+            animation-name: fadeInRight;
+        }
+
+        .gallery-item:hover {
+            transform: translateY(-8px) scale(1.02);
+            transition: all 0.3s ease;
+        }
+
+        .bento-grid {
+            display: grid;
+            gap: 1rem;
+            grid-auto-rows: 180px;
+        }
+
+        /* Mobile: 2 columns with bento layout */
+        @media (max-width: 639px) {
+            .bento-grid {
+                grid-template-columns: repeat(2, 1fr);
+                grid-auto-rows: 150px;
+            }
+        }
+
+        /* Tablet: 3 columns */
+        @media (min-width: 640px) and (max-width: 1023px) {
+            .bento-grid {
+                grid-template-columns: repeat(3, 1fr);
+                grid-auto-rows: 170px;
+            }
+        }
+
+        /* Desktop: 4 columns */
+        @media (min-width: 1024px) {
+            .bento-grid {
+                grid-template-columns: repeat(4, 1fr);
+                grid-auto-rows: 200px;
+            }
+        }
+
+        /* Bento box size variations */
+        .bento-small {
+            grid-row: span 1;
+            grid-column: span 1;
+        }
+
+        .bento-medium-h {
+            grid-column: span 2;
+            grid-row: span 1;
+        }
+
+        .bento-medium-v {
+            grid-row: span 2;
+            grid-column: span 1;
+        }
+
+        .bento-large {
+            grid-row: span 2;
+            grid-column: span 2;
+        }
+
+        .quote-text {
+            font-style: italic;
+            line-height: 1.4;
+        }
+
+        .celebration-badge {
+            background: linear-gradient(135deg, var(--color-1), var(--color-2));
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        .color-palette {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 12px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+
+        .color-option {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 3px solid white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            transition: transform 0.3s;
+        }
+
+        .color-option:hover {
+            transform: scale(1.15);
+        }
+
+        .image-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .gallery-item:hover .image-container img {
+            transform: scale(1.1);
+        }
+
+        .quote-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 1rem;
+            background: linear-gradient(to top, rgba(0,0,0,0.85), rgba(0,0,0,0.3), transparent);
+            transform: translateY(100%);
+            transition: transform 0.4s ease;
+        }
+
+        .gallery-item:hover .quote-overlay {
+            transform: translateY(0);
+        }
+
+        @media (max-width: 639px) {
+            .quote-overlay {
+                padding: 0.75rem;
+                transform: translateY(0);
+                background: linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0.4), transparent);
+            }
+        }
+
+        /* Parallax effect on scroll */
+        .parallax-slow {
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+    </style>
+</head>
+<body>
+ 
+
+    <!-- Header -->
+    <div class="text-center py-12 px-4">
+        <div class="celebration-badge inline-block text-white px-6 py-2 md:px-8 md:py-3 rounded-full text-xs md:text-sm font-bold mb-4">
+            🎉 MILESTONE ACHIEVED 🎉
+        </div>
+        <h1 class="text-4xl md:text-7xl font-bold mb-4" style="color: var(--color-1);">
+            50,000+ Followers!
+        </h1>
+        <p class="text-lg md:text-2xl mb-2" style="color: var(--color-2);">
+            A massive congratulations on your achievement!
+        </p>
+        <p class="text-base md:text-lg opacity-75" style="color: var(--color-1);">
+            What have you shared lately? Take a look back.
+
+        </p>
+    </div>
+
+    <!-- Bento Grid Gallery -->
+    <div class="max-w-7xl mx-auto px-3 md:px-4 pb-16">
+        <div class="bento-grid" id="gallery">
+            <!-- Gallery items will be inserted here -->
+        </div>
+    </div>
+
+    <script>
+        // Gallery data with quotes
+        const galleryData = [
+            { quote: "Dreams don't work unless you do", size: "large" },
+            { quote: "Be the energy you want to attract", size: "small" },
+            { quote: "Create your own sunshine", size: "medium-v" },
+            { quote: "Life is better when you're laughing", size: "small" },
+            { quote: "Good vibes only", size: "medium-h" },
+            { quote: "Collect moments, not things", size: "small" },
+            { quote: "Stay wild, moon child", size: "medium-v" },
+            { quote: "Gratitude changes everything", size: "small" },
+            { quote: "Choose joy every day", size: "large" },
+            { quote: "Blessed beyond measure", size: "small" },
+            { quote: "Adventure awaits", size: "medium-h" },
+            { quote: "Spread love everywhere", size: "small" },
+            { quote: "Life is a beautiful ride", size: "medium-v" },
+            { quote: "Find beauty in small things", size: "small" },
+            { quote: "Make today amazing", size: "small" },
+            { quote: "Shine bright like a diamond", size: "medium-h" },
+            { quote: "Live in the moment", size: "small" },
+            { quote: "Happiness looks gorgeous on you", size: "large" },
+            { quote: "Together we rise", size: "small" },
+            { quote: "Love more, worry less", size: "medium-v" },
+            { quote: "You are magic", size: "small" },
+            { quote: "Believe in your dreams", size: "small" },
+            { quote: "Every day is a fresh start", size: "medium-h" },
+            { quote: "Dare to be different", size: "small" },
+            { quote: "You are enough", size: "medium-v" },
+            { quote: "Trust the journey", size: "small" },
+            { quote: "Keep growing, keep glowing", size: "large" },
+            { quote: "Your vibe attracts your tribe", size: "small" },
+            { quote: "Be fearless in the pursuit", size: "small" },
+            { quote: "50K of love for you!", size: "medium-h" }
+        ];
+
+        // Create gallery items
+        const gallery = document.getElementById('gallery');
+        galleryData.forEach((item, index) => {
+            const div = document.createElement('div');
+            div.className = `gallery-item bento-${item.size} parallax-slow`;
+            div.style.animationDelay = `${index * 0.05}s`;
+            div.innerHTML = `
+                <div class="bg-white rounded-xl md:rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 h-full">
+                    <div class="image-container">
+                        <img src="img/img${index + 1}.jpg" alt="Gallery image ${index + 1}" loading="lazy">
+                        <div class="quote-overlay">
+                            <p class="quote-text text-white text-xs md:text-base font-medium drop-shadow-lg">"${item.quote}"</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            gallery.appendChild(div);
+        });
+
+        // Scroll-driven animation observer
+        const observerOptions = {
+            threshold: 0.15,
+            rootMargin: '0px 0px -100px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animate');
+                    // Optional: unobserve after animation to improve performance
+                    // observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        // Observe all gallery items
+        document.querySelectorAll('.gallery-item').forEach(item => {
+            observer.observe(item);
+        });
+
+        // Parallax effect on scroll
+        let ticking = false;
+        window.addEventListener('scroll', () => {
+            if (!ticking) {
+                window.requestAnimationFrame(() => {
+                    const scrolled = window.pageYOffset;
+                    const parallaxItems = document.querySelectorAll('.parallax-slow');
+                    
+                    parallaxItems.forEach((item, index) => {
+                        const rect = item.getBoundingClientRect();
+                        const speed = (index % 3) * 0.05 + 0.05;
+                        
+                        if (rect.top < window.innerHeight && rect.bottom > 0) {
+                            const yPos = -(scrolled * speed);
+                            item.style.transform = `translateY(${yPos}px)`;
+                        }
+                    });
+                    
+                    ticking = false;
+                });
+                ticking = true;
+            }
+        });
+
+        // Color palette changer
+        function changeColors(c1, c2, c3, c4) {
+            document.documentElement.style.setProperty('--color-1', c1);
+            document.documentElement.style.setProperty('--color-2', c2);
+            document.documentElement.style.setProperty('--color-3', c3);
+            document.documentElement.style.setProperty('--color-4', c4);
+        }
+    </script>
+</body>
+</html>
